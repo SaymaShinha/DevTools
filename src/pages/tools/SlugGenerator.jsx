@@ -1,150 +1,180 @@
 import { useMemo, useState } from "react";
+import { Wand2 } from "lucide-react";
+
+import SEO from "../../components/SEO.jsx";
 import ToolLayout from "../../components/ToolLayout.jsx";
+import CopyButton from "../../components/CopyButton.jsx";
+import ClearButton from "../../components/ClearButton.jsx";
+import { faqData } from "../../data/faq.js";
+import { tools } from "../../data/tools.js";
 
-export default function WordCounter() {
-  const [text, setText] = useState("");
+const relatedTools = tools.filter((tool) =>
+  [
+    "/tools/text-case-converter",
+    "/tools/url-encoder",
+    "/tools/word-counter",
+  ].includes(tool.path),
+);
 
-  const stats = useMemo(() => {
-    const trimmed = text.trim();
+function createSlug(value) {
+  return value
+    .normalize("NFKD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .toLowerCase()
+    .trim()
+    .replace(/[^\p{L}\p{N}\s-]/gu, "")
+    .replace(/[\s_-]+/g, "-")
+    .replace(/^-+|-+$/g, "");
+}
 
-    const words = trimmed ? trimmed.split(/\s+/).filter(Boolean).length : 0;
+export default function SlugGenerator() {
+  const [input, setInput] = useState("");
 
-    const characters = text.length;
-
-    const charactersNoSpaces = text.replace(/\s/g, "").length;
-
-    const sentences = trimmed
-      ? trimmed.split(/[.!?]+/).filter(Boolean).length
-      : 0;
-
-    const paragraphs = trimmed
-      ? trimmed.split(/\n\s*\n/).filter(Boolean).length
-      : 0;
-
-    const readingTime = words === 0 ? 0 : Math.max(1, Math.ceil(words / 200));
-
-    return {
-      words,
-      characters,
-      charactersNoSpaces,
-      sentences,
-      paragraphs,
-      readingTime,
-    };
-  }, [text]);
+  const output = useMemo(() => createSlug(input), [input]);
 
   return (
-    <ToolLayout
-      title="Word Counter"
-      slug="word-counter"
-      category="Text"
-      description="Count words, characters, sentences, paragraphs, and estimated reading time instantly."
-      howToUse={[
-        "Paste or type your text into the editor.",
-        "Review the live statistics.",
-        "Use the word and character counts for your writing requirements.",
-      ]}
-      features={[
-        {
-          title: "Word count",
-          description: "Count words in your text.",
-        },
-        {
-          title: "Character count",
-          description: "See characters with and without spaces.",
-        },
-        {
-          title: "Sentence count",
-          description: "Estimate the number of sentences.",
-        },
-        {
-          title: "Reading time",
-          description: "Estimate reading time based on word count.",
-        },
-      ]}
-      example={{
-        input: "Hello world. This is a simple example.",
-        output: "Words: 7 | Characters: 40",
-      }}
-      whatIs={{
-        title: "word counting",
-        paragraphs: [
-          "A word counter analyzes written text and provides statistics such as word count and character count.",
-          "Word counts are useful for essays, articles, blog posts, social media content, applications, and documents with length requirements.",
-        ],
-      }}
-      useCases={[
-        "Checking essay length.",
-        "Writing blog posts.",
-        "Preparing social media content.",
-        "Meeting application or assignment word limits.",
-      ]}
-      faqs={[
-        {
-          question: "What is a URL slug?",
-          answer:
-            "A URL slug is the readable part of a web address that identifies a page, usually using lowercase words separated by hyphens.",
-        },
-        {
-          question: "How does a slug generator work?",
-          answer:
-            "It converts a title or phrase into a URL-friendly form by normalizing text, removing unsuitable characters, and replacing spaces with hyphens.",
-        },
-        {
-          question: "Why are URL slugs useful?",
-          answer:
-            "Readable slugs make URLs easier for people to understand and can help communicate the topic of a page.",
-        },
-        {
-          question: "Should a slug contain spaces?",
-          answer: "Spaces are generally replaced with hyphens in URL slugs.",
-        },
-        {
-          question: "Can I use the generated slug for a blog post?",
-          answer:
-            "Yes. The generated value can be used as a starting point for a blog post, product page, documentation page, or other web resource.",
-        },
-      ]}
-      relatedTools={[
-        {
-          name: "Text Case Converter",
-          slug: "text-case-converter",
-          description: "Convert text capitalization.",
-        },
-        {
-          name: "Slug Generator",
-          slug: "slug-generator",
-          description: "Generate URL-friendly text.",
-        },
-      ]}
-    >
-      <div className="space-y-6">
-        <textarea
-          value={text}
-          onChange={(e) => setText(e.target.value)}
-          placeholder="Start typing or paste your text..."
-          className="min-h-[300px] w-full rounded-xl border border-slate-200 bg-white p-5 text-slate-900 outline-none focus:border-indigo-500 focus:ring-4 focus:ring-indigo-100"
-        />
+    <>
+      <SEO
+        title="Slug Generator - Create URL Slugs Online"
+        description="Generate clean, readable URL slugs from titles and text with a free browser-based slug generator."
+        canonical="/tools/slug-generator"
+      />
 
-        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-          {[
-            ["Words", stats.words],
-            ["Characters", stats.characters],
-            ["Characters without spaces", stats.charactersNoSpaces],
-            ["Sentences", stats.sentences],
-            ["Paragraphs", stats.paragraphs],
-            ["Reading time", `${stats.readingTime} min`],
-          ].map(([label, value]) => (
-            <div
-              key={label}
-              className="rounded-xl border border-slate-200 bg-slate-50 p-5"
-            >
-              <p className="text-sm text-slate-500">{label}</p>
-              <p className="mt-2 text-2xl font-bold text-slate-900">{value}</p>
+      <ToolLayout
+        title="Slug Generator"
+        description="Create clean, readable, URL-friendly slugs from titles and phrases."
+        intro={
+          <>
+            <p>
+              A URL slug is the readable portion of a web address that often
+              identifies a specific page. This generator turns titles and
+              phrases into lowercase, hyphen-separated slugs.
+            </p>
+
+            <p className="mt-5">
+              The tool removes unnecessary punctuation and converts whitespace
+              into hyphens, making the result convenient for websites,
+              documentation systems, and content management applications.
+            </p>
+          </>
+        }
+        howToUse={[
+          "Enter a page title or phrase.",
+          "Review the generated slug.",
+          "Copy the result.",
+          "Use the slug as the appropriate part of a URL.",
+        ]}
+        features={[
+          {
+            title: "Lowercase output",
+            description: "Creates consistent lowercase slugs.",
+          },
+          {
+            title: "Hyphen separators",
+            description: "Converts spaces and separators into hyphens.",
+          },
+          {
+            title: "Punctuation cleanup",
+            description:
+              "Removes unnecessary punctuation from the generated slug.",
+          },
+          {
+            title: "Live generation",
+            description: "The slug updates as you edit the title.",
+          },
+        ]}
+        example={
+          <div className="p-5">
+            <div className="grid gap-3 sm:grid-cols-2">
+              <div className="rounded-lg border border-slate-200 p-4">
+                <p className="text-xs font-semibold uppercase text-slate-500">
+                  Title
+                </p>
+                <p className="mt-2 text-slate-900">
+                  How to Build a Modern React Website
+                </p>
+              </div>
+
+              <div className="rounded-lg border border-slate-200 p-4">
+                <p className="text-xs font-semibold uppercase text-slate-500">
+                  Slug
+                </p>
+                <p className="mt-2 font-mono text-sm text-indigo-600">
+                  how-to-build-a-modern-react-website
+                </p>
+              </div>
             </div>
-          ))}
+          </div>
+        }
+        aboutTitle="What Is a URL Slug?"
+        aboutContent={
+          <>
+            <p>
+              A URL slug is typically the final descriptive segment of a web
+              address. For example, the phrase
+              <code className="mx-1">json-formatter</code> can identify a page
+              dedicated to a JSON formatting tool.
+            </p>
+
+            <p>
+              Readable slugs help people understand what a URL represents before
+              visiting it. Consistent slugs can also make website structures
+              easier to maintain.
+            </p>
+
+            <p>
+              A slug generator automates the repetitive cleanup involved in
+              converting titles into URL-friendly text.
+            </p>
+          </>
+        }
+        useCases={[
+          {
+            title: "Blog posts",
+            description: "Convert article titles into readable page URLs.",
+          },
+          {
+            title: "Documentation",
+            description:
+              "Create consistent paths for technical documentation pages.",
+          },
+          {
+            title: "CMS content",
+            description: "Prepare URL identifiers from content titles.",
+          },
+          {
+            title: "Web development",
+            description:
+              "Quickly test how titles could be represented as slugs.",
+          },
+        ]}
+        faqItems={faqData["slug-generator"]}
+        relatedTools={relatedTools}
+      >
+        <div className="space-y-5">
+          <input
+            value={input}
+            onChange={(e) => setInput(e.target.value)}
+            className="w-full rounded-xl border border-slate-300 bg-slate-50 p-4 text-sm outline-none focus:border-indigo-500 focus:ring-2 focus:ring-indigo-100"
+            placeholder="Enter a page title..."
+          />
+
+          <div className="flex items-center gap-2 text-sm font-medium text-indigo-600">
+            <Wand2 size={17} />
+            Generated slug
+          </div>
+
+          <div className="rounded-xl bg-slate-950 p-5 font-mono text-sm leading-7 text-slate-200">
+            {output || "your-generated-slug"}
+          </div>
+
+          <div className="flex flex-wrap gap-3">
+            <CopyButton text={output} label="Copy Slug" />
+
+            <ClearButton onClick={() => setInput("")} disabled={!input} />
+          </div>
         </div>
-      </div>
-    </ToolLayout>
+      </ToolLayout>
+    </>
   );
 }

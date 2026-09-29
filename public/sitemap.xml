@@ -4,87 +4,87 @@
   xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
 
   <url>
-    <loc>https://yourdomain.com/</loc>
+    <loc>https://devtools-toolkit.vercel.app/</loc>
   </url>
 
   <url>
-    <loc>https://yourdomain.com/tools/json-formatter</loc>
+    <loc>https://devtools-toolkit.vercel.app/tools/json-formatter</loc>
   </url>
 
   <url>
-    <loc>https://yourdomain.com/tools/json-validator</loc>
+    <loc>https://devtools-toolkit.vercel.app/tools/json-validator</loc>
   </url>
 
   <url>
-    <loc>https://yourdomain.com/tools/base64-encoder</loc>
+    <loc>https://devtools-toolkit.vercel.app/tools/base64-encoder</loc>
   </url>
 
   <url>
-    <loc>https://yourdomain.com/tools/base64-decoder</loc>
+    <loc>https://devtools-toolkit.vercel.app/tools/base64-decoder</loc>
   </url>
 
   <url>
-    <loc>https://yourdomain.com/tools/url-encoder</loc>
+    <loc>https://devtools-toolkit.vercel.app/tools/url-encoder</loc>
   </url>
 
   <url>
-    <loc>https://yourdomain.com/tools/url-decoder</loc>
+    <loc>https://devtools-toolkit.vercel.app/tools/url-decoder</loc>
   </url>
 
   <url>
-    <loc>https://yourdomain.com/tools/html-encoder</loc>
+    <loc>https://devtools-toolkit.vercel.app/tools/html-encoder</loc>
   </url>
 
   <url>
-    <loc>https://yourdomain.com/tools/html-formatter</loc>
+    <loc>https://devtools-toolkit.vercel.app/tools/html-formatter</loc>
   </url>
 
   <url>
-    <loc>https://yourdomain.com/tools/text-case-converter</loc>
+    <loc>https://devtools-toolkit.vercel.app/tools/text-case-converter</loc>
   </url>
 
   <url>
-    <loc>https://yourdomain.com/tools/word-counter</loc>
+    <loc>https://devtools-toolkit.vercel.app/tools/word-counter</loc>
   </url>
 
   <url>
-    <loc>https://yourdomain.com/tools/slug-generator</loc>
+    <loc>https://devtools-toolkit.vercel.app/tools/slug-generator</loc>
   </url>
 
   <url>
-    <loc>https://yourdomain.com/tools/uuid-generator</loc>
+    <loc>https://devtools-toolkit.vercel.app/tools/uuid-generator</loc>
   </url>
 
   <url>
-    <loc>https://yourdomain.com/tools/timestamp-converter</loc>
+    <loc>https://devtools-toolkit.vercel.app/tools/timestamp-converter</loc>
   </url>
 
   <url>
-    <loc>https://yourdomain.com/tools/color-converter</loc>
+    <loc>https://devtools-toolkit.vercel.app/tools/color-converter</loc>
   </url>
 
   <url>
-    <loc>https://yourdomain.com/tools/regex-tester</loc>
+    <loc>https://devtools-toolkit.vercel.app/tools/regex-tester</loc>
   </url>
 
   <url>
-    <loc>https://yourdomain.com/about</loc>
+    <loc>https://devtools-toolkit.vercel.app/about</loc>
   </url>
 
   <url>
-    <loc>https://yourdomain.com/contact</loc>
+    <loc>https://devtools-toolkit.vercel.app/contact</loc>
   </url>
 
   <url>
-    <loc>https://yourdomain.com/privacy-policy</loc>
+    <loc>https://devtools-toolkit.vercel.app/privacy-policy</loc>
   </url>
 
   <url>
-    <loc>https://yourdomain.com/terms-of-use</loc>
+    <loc>https://devtools-toolkit.vercel.app/terms-of-use</loc>
   </url>
 
   <url>
-    <loc>https://yourdomain.com/cookie-policy</loc>
+    <loc>https://devtools-toolkit.vercel.app/cookie-policy</loc>
   </url>
 
 </urlset>

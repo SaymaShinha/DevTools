@@ -1,235 +1,269 @@
-import { useState } from "react";
-import { Copy, Check, Trash2, Minimize2 } from "lucide-react";
+import { useMemo, useState } from "react";
+import { AlertCircle, CheckCircle2, Minimize2, Wand2 } from "lucide-react";
+
+import SEO from "../../components/SEO.jsx";
 import ToolLayout from "../../components/ToolLayout.jsx";
+import CopyButton from "../../components/CopyButton.jsx";
+import ClearButton from "../../components/ClearButton.jsx";
+import { faqData } from "../../data/faq.js";
+import { tools } from "../../data/tools.js";
+
+const relatedTools = tools.filter((tool) =>
+  [
+    "/tools/json-validator",
+    "/tools/html-formatter",
+    "/tools/url-encoder",
+    "/tools/text-case-converter",
+  ].includes(tool.path),
+);
+
+const sampleJson = `{
+  "name": "DevTools",
+  "type": "developer-tool",
+  "features": ["formatting", "validation"],
+  "active": true
+}`;
 
 export default function JsonFormatter() {
-  const [input, setInput] = useState("");
+  const [input, setInput] = useState(sampleJson);
   const [output, setOutput] = useState("");
   const [error, setError] = useState("");
-  const [copied, setCopied] = useState(false);
 
-  const formatJSON = () => {
-    if (!input.trim()) {
-      setOutput("");
-      setError("Please enter JSON data.");
-      return;
-    }
-
+  const formatJson = () => {
     try {
       const parsed = JSON.parse(input);
       setOutput(JSON.stringify(parsed, null, 2));
       setError("");
     } catch (err) {
       setOutput("");
-      setError(`Invalid JSON: ${err.message}`);
+      setError(err.message || "Invalid JSON.");
     }
   };
 
-  const minifyJSON = () => {
-    if (!input.trim()) {
-      setOutput("");
-      setError("Please enter JSON data.");
-      return;
-    }
-
+  const minifyJson = () => {
     try {
       const parsed = JSON.parse(input);
       setOutput(JSON.stringify(parsed));
       setError("");
     } catch (err) {
       setOutput("");
-      setError(`Invalid JSON: ${err.message}`);
+      setError(err.message || "Invalid JSON.");
     }
   };
 
-  const copyOutput = async () => {
-    if (!output) return;
+  const isValid = useMemo(() => {
+    if (!input.trim()) return false;
 
-    await navigator.clipboard.writeText(output);
-    setCopied(true);
-
-    setTimeout(() => setCopied(false), 1500);
-  };
-
-  const clearAll = () => {
-    setInput("");
-    setOutput("");
-    setError("");
-  };
+    try {
+      JSON.parse(input);
+      return true;
+    } catch {
+      return false;
+    }
+  }, [input]);
 
   return (
-    <ToolLayout
-      title="JSON Formatter"
-      slug="json-formatter"
-      category="JSON"
-      description="Format, beautify, and minify JSON data directly in your browser. Quickly turn difficult-to-read JSON into a clean and properly indented structure."
-      howToUse={[
-        "Paste your JSON data into the input editor.",
-        "Click Format JSON to validate and beautify the JSON.",
-        "Use Minify JSON when you need a compact version.",
-        "Copy the formatted result using the Copy button.",
-      ]}
-      features={[
-        {
-          title: "Instant JSON formatting",
-          description:
-            "Convert compact or poorly formatted JSON into a readable structure.",
-        },
-        {
-          title: "JSON validation",
-          description:
-            "Invalid JSON is detected and the parsing error is displayed.",
-        },
-        {
-          title: "Minify JSON",
-          description:
-            "Create a compact JSON representation without unnecessary whitespace.",
-        },
-        {
-          title: "Browser-based",
-          description:
-            "The formatting operation runs directly in your browser.",
-        },
-      ]}
-      example={{
-        input: '{"name":"John","age":30,"active":true}',
-        output: '{\n  "name": "John",\n  "age": 30,\n  "active": true\n}',
-      }}
-      whatIs={{
-        title: "JSON formatting",
-        paragraphs: [
-          "JSON formatting is the process of organizing JavaScript Object Notation data with indentation and line breaks so that it is easier for people to read.",
-          "JSON is commonly used for APIs, configuration files, application data, and communication between web applications. Proper formatting makes nested objects and arrays easier to inspect.",
-          "This JSON Formatter parses your input and generates a consistently indented representation in your browser.",
-        ],
-      }}
-      useCases={[
-        "Inspecting API responses during development.",
-        "Reading large JSON configuration files.",
-        "Checking whether JSON data is syntactically valid.",
-        "Preparing JSON for documentation or debugging.",
-        "Minifying JSON before using it in applications.",
-      ]}
-      faqs={[
-        {
-          question: "What is a JSON Formatter?",
-          answer:
-            "A JSON Formatter organizes JSON data with indentation and line breaks so that its structure is easier to read, inspect, and understand.",
-        },
-        {
-          question: "How do I format JSON?",
-          answer:
-            "Paste your JSON into the input area and click the Format button. The tool will parse the JSON and display it with readable indentation.",
-        },
-        {
-          question: "Can I format large JSON files?",
-          answer:
-            "Yes, although performance depends on the size of the JSON and your browser. Very large files may take longer to process.",
-        },
-        {
-          question: "Does the JSON Formatter send my data to a server?",
-          answer:
-            "No. The formatter processes your JSON directly in your browser, so the tool does not need to send your input to a server.",
-        },
-        {
-          question: "Can I minify JSON?",
-          answer:
-            "Yes. Minifying JSON removes unnecessary whitespace and line breaks, producing a more compact JSON representation.",
-        },
-      ]}
-      relatedTools={[
-        {
-          name: "JSON Validator",
-          slug: "json-validator",
-          description: "Check JSON syntax and identify parsing errors.",
-        },
-        {
-          name: "HTML Formatter",
-          slug: "html-formatter",
-          description: "Format HTML into a more readable structure.",
-        },
-        {
-          name: "Base64 Encoder",
-          slug: "base64-encoder",
-          description: "Encode text into Base64 format.",
-        },
-      ]}
-    >
-      <div className="space-y-6">
-        {/* Input */}
-        <div>
-          <div className="mb-2 flex items-center justify-between">
-            <label className="font-semibold text-slate-900">JSON Input</label>
+    <>
+      <SEO
+        title="JSON Formatter - Format JSON Online"
+        description="Format and beautify JSON online with readable indentation. Validate JSON syntax and minify JSON directly in your browser."
+        canonical="/tools/json-formatter"
+      />
 
-            <button
-              type="button"
-              onClick={clearAll}
-              className="inline-flex items-center gap-2 text-sm text-slate-500 hover:text-red-600"
+      <ToolLayout
+        title="JSON Formatter"
+        description="Format, beautify, and minify JSON data with a fast browser-based JSON formatter."
+        intro={
+          <>
+            <p>
+              JSON Formatter is a browser-based utility for turning compact or
+              difficult-to-read JSON into a clearly structured format. Proper
+              indentation makes nested objects, arrays, properties, and values
+              much easier to inspect.
+            </p>
+
+            <p className="mt-5">
+              You can also use the formatter to minify valid JSON when you need
+              a compact representation. Processing happens directly in the
+              browser, so you can work with JSON without setting up a server
+              just for formatting.
+            </p>
+          </>
+        }
+        howToUse={[
+          "Paste your JSON into the input editor.",
+          "Click Format JSON to create an indented version.",
+          "Review the result and copy it when you are ready.",
+          "Use Minify JSON when you need a compact representation.",
+        ]}
+        features={[
+          {
+            title: "Readable indentation",
+            description:
+              "Nested JSON objects and arrays are displayed with consistent indentation.",
+          },
+          {
+            title: "Syntax feedback",
+            description:
+              "Invalid JSON is reported instead of producing misleading formatted output.",
+          },
+          {
+            title: "Minification",
+            description:
+              "Convert valid JSON into a compact single-line representation.",
+          },
+          {
+            title: "Browser-based",
+            description:
+              "Formatting can be performed directly in your browser without a backend.",
+          },
+        ]}
+        example={
+          <div className="grid gap-4 p-5 sm:grid-cols-2">
+            <div>
+              <p className="mb-2 text-sm font-semibold text-slate-700">Input</p>
+              <pre className="rounded-xl bg-slate-950 p-4 text-sm leading-6 text-slate-200">
+                {`{"name":"DevTools","active":true}`}
+              </pre>
+            </div>
+
+            <div>
+              <p className="mb-2 text-sm font-semibold text-slate-700">
+                Formatted
+              </p>
+              <pre className="rounded-xl bg-slate-950 p-4 text-sm leading-6 text-slate-200">
+                {`{
+  "name": "DevTools",
+  "active": true
+}`}
+              </pre>
+            </div>
+          </div>
+        }
+        aboutTitle="What Is JSON Formatting?"
+        aboutContent={
+          <>
+            <p>
+              JSON stands for JavaScript Object Notation. It is a lightweight
+              text format widely used for exchanging structured data between
+              applications, APIs, databases, and configuration systems.
+            </p>
+
+            <p>
+              JSON does not require whitespace for its structure, which means
+              compact JSON can be difficult for humans to inspect. Formatting
+              adds line breaks and indentation while preserving the underlying
+              data structure.
+            </p>
+
+            <p>
+              A formatter is especially useful when debugging API responses,
+              reviewing configuration files, inspecting nested data, or
+              preparing JSON for documentation.
+            </p>
+          </>
+        }
+        useCases={[
+          {
+            title: "API debugging",
+            description:
+              "Make API responses easier to inspect while troubleshooting requests and responses.",
+          },
+          {
+            title: "Configuration files",
+            description:
+              "Improve the readability of JSON configuration files during development.",
+          },
+          {
+            title: "Code review",
+            description:
+              "Present structured JSON in a consistent format when reviewing changes.",
+          },
+          {
+            title: "Documentation",
+            description:
+              "Prepare readable JSON examples for technical documentation.",
+          },
+        ]}
+        faqItems={faqData["json-formatter"]}
+        relatedTools={relatedTools}
+      >
+        <div className="space-y-5">
+          <div className="flex flex-wrap items-center gap-2">
+            <span
+              className={`inline-flex items-center gap-2 rounded-full px-3 py-1.5 text-sm font-medium ${
+                isValid
+                  ? "bg-green-50 text-green-700"
+                  : "bg-slate-100 text-slate-600"
+              }`}
             >
-              <Trash2 size={16} />
-              Clear
-            </button>
+              {isValid && <CheckCircle2 size={15} />}
+              {isValid ? "Valid JSON" : "Enter JSON to validate"}
+            </span>
           </div>
 
           <textarea
             value={input}
-            onChange={(e) => setInput(e.target.value)}
-            placeholder='{"name":"John","age":30}'
-            className="min-h-[260px] w-full resize-y rounded-xl border border-slate-200 bg-slate-950 p-5 font-mono text-sm leading-7 text-slate-100 outline-none placeholder:text-slate-600 focus:border-indigo-500 focus:ring-4 focus:ring-indigo-100"
-            spellCheck="false"
+            onChange={(e) => {
+              setInput(e.target.value);
+              setError("");
+            }}
+            rows={14}
+            spellCheck={false}
+            className="w-full rounded-xl border border-slate-300 bg-slate-950 p-4 font-mono text-sm leading-6 text-slate-100 outline-none transition focus:border-indigo-500 focus:ring-2 focus:ring-indigo-100"
+            placeholder='Paste JSON here, for example: {"name":"John"}'
           />
-        </div>
 
-        {/* Buttons */}
-        <div className="flex flex-wrap gap-3">
-          <button
-            type="button"
-            onClick={formatJSON}
-            className="rounded-lg bg-indigo-600 px-5 py-3 font-semibold text-white transition hover:bg-indigo-700"
-          >
-            Format JSON
-          </button>
-
-          <button
-            type="button"
-            onClick={minifyJSON}
-            className="inline-flex items-center gap-2 rounded-lg border border-slate-200 bg-white px-5 py-3 font-semibold text-slate-700 transition hover:bg-slate-50"
-          >
-            <Minimize2 size={17} />
-            Minify
-          </button>
-        </div>
-
-        {/* Error */}
-        {error && (
-          <div className="rounded-xl border border-red-200 bg-red-50 p-4 text-sm leading-6 text-red-700">
-            {error}
-          </div>
-        )}
-
-        {/* Output */}
-        <div>
-          <div className="mb-2 flex items-center justify-between">
-            <label className="font-semibold text-slate-900">
-              Formatted JSON
-            </label>
+          <div className="flex flex-wrap gap-3">
+            <button
+              type="button"
+              onClick={formatJson}
+              className="inline-flex items-center gap-2 rounded-lg bg-indigo-600 px-4 py-2.5 text-sm font-semibold text-white transition hover:bg-indigo-700"
+            >
+              <Wand2 size={17} />
+              Format JSON
+            </button>
 
             <button
               type="button"
-              onClick={copyOutput}
-              disabled={!output}
-              className="inline-flex items-center gap-2 rounded-lg px-3 py-2 text-sm font-medium text-slate-600 transition hover:bg-slate-100 disabled:cursor-not-allowed disabled:opacity-40"
+              onClick={minifyJson}
+              className="inline-flex items-center gap-2 rounded-lg border border-slate-300 bg-white px-4 py-2.5 text-sm font-semibold text-slate-700 transition hover:bg-slate-50"
             >
-              {copied ? <Check size={16} /> : <Copy size={16} />}
-              {copied ? "Copied" : "Copy"}
+              <Minimize2 size={17} />
+              Minify JSON
             </button>
+
+            <ClearButton
+              onClick={() => {
+                setInput("");
+                setOutput("");
+                setError("");
+              }}
+              disabled={!input && !output}
+            />
           </div>
 
-          <pre className="min-h-[260px] overflow-x-auto rounded-xl bg-slate-950 p-5 font-mono text-sm leading-7 text-slate-200">
-            {output || "// Formatted JSON will appear here"}
-          </pre>
+          {error && (
+            <div className="flex gap-3 rounded-xl border border-red-200 bg-red-50 p-4 text-sm text-red-700">
+              <AlertCircle className="mt-0.5 shrink-0" size={18} />
+              <span>{error}</span>
+            </div>
+          )}
+
+          {output && (
+            <div>
+              <div className="mb-2 flex items-center justify-between gap-3">
+                <h2 className="font-semibold text-slate-900">Result</h2>
+                <CopyButton text={output} />
+              </div>
+
+              <pre className="max-h-[500px] overflow-auto rounded-xl bg-slate-950 p-4 font-mono text-sm leading-6 text-slate-200">
+                {output}
+              </pre>
+            </div>
+          )}
         </div>
-      </div>
-    </ToolLayout>
+      </ToolLayout>
+    </>
   );
 }

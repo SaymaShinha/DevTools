@@ -6,7 +6,7 @@ export default function CookiePolicy() {
       <SEO
         title="Cookie Policy - DevTools"
         description="Read the DevTools cookie policy."
-        canonical="https://yourdomain.com/cookie-policy"
+        canonical="https://devtools-toolkit.vercel.app/cookie-policy"
       />
 
       <main className="mx-auto max-w-4xl px-4 py-16">

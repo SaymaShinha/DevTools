@@ -6,7 +6,7 @@ export default function About() {
       <SEO
         title="About DevTools"
         description="Learn about DevTools and its collection of simple browser-based developer utilities."
-        canonical="https://yourdomain.com/about"
+        canonical="https://devtools-toolkit.vercel.app/about"
       />
 
       <main className="mx-auto max-w-4xl px-4 py-16">

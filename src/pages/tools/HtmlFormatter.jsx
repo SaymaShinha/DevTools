@@ -1,148 +1,254 @@
 import { useState } from "react";
+import { Braces, AlertCircle } from "lucide-react";
+
+import SEO from "../../components/SEO.jsx";
 import ToolLayout from "../../components/ToolLayout.jsx";
+import CopyButton from "../../components/CopyButton.jsx";
+import ClearButton from "../../components/ClearButton.jsx";
+import { faqData } from "../../data/faq.js";
+import { tools } from "../../data/tools.js";
 
-function formatHTML(html) {
-  let formatted = html.replace(/>\s*</g, "><").replace(/</g, "\n<").trim();
+const relatedTools = tools.filter((tool) =>
+  [
+    "/tools/html-encoder",
+    "/tools/json-formatter",
+    "/tools/text-case-converter",
+  ].includes(tool.path),
+);
 
-  const lines = formatted.split("\n");
+function formatHtml(html) {
+  const normalized = html.replace(/>\s+</g, "><").replace(/</g, "\n<").trim();
+
+  const tokens = normalized
+    .split("\n")
+    .map((line) => line.trim())
+    .filter(Boolean);
+
   let indent = 0;
+  const result = [];
 
-  return lines
-    .map((line) => {
-      line = line.trim();
+  const voidTags = new Set([
+    "area",
+    "base",
+    "br",
+    "col",
+    "embed",
+    "hr",
+    "img",
+    "input",
+    "link",
+    "meta",
+    "param",
+    "source",
+    "track",
+    "wbr",
+  ]);
 
-      if (/^<\//.test(line)) {
-        indent = Math.max(indent - 1, 0);
-      }
+  tokens.forEach((token) => {
+    const closing = /^<\//.test(token);
+    const openingMatch = token.match(/^<([a-zA-Z0-9-]+)/);
+    const tagName = openingMatch?.[1]?.toLowerCase();
 
-      const result = "  ".repeat(indent) + line;
+    if (closing) {
+      indent = Math.max(0, indent - 1);
+    }
 
-      if (
-        /^<[^!/][^>]*>$/.test(line) &&
-        !/<\/[^>]+>$/.test(line) &&
-        !/\/>$/.test(line) &&
-        !/^<(input|img|br|hr|meta|link)\b/i.test(line)
-      ) {
-        indent++;
-      }
+    result.push(`${"  ".repeat(indent)}${token}`);
 
-      return result;
-    })
-    .join("\n");
+    const selfClosing =
+      /\/>$/.test(token) || (tagName && voidTags.has(tagName));
+
+    const isOpening = /^<[^!/][^>]*>$/.test(token) && !closing && !selfClosing;
+
+    if (isOpening) {
+      indent += 1;
+    }
+  });
+
+  return result.join("\n");
 }
 
 export default function HtmlFormatter() {
-  const [input, setInput] = useState("");
+  const [input, setInput] = useState(
+    `<div><h1>Hello</h1><p>Welcome to DevTools.</p></div>`,
+  );
   const [output, setOutput] = useState("");
+  const [error, setError] = useState("");
+
+  const format = () => {
+    if (!input.trim()) {
+      setOutput("");
+      setError("Enter HTML to format.");
+      return;
+    }
+
+    try {
+      setOutput(formatHtml(input));
+      setError("");
+    } catch {
+      setOutput("");
+      setError("Unable to format the supplied HTML.");
+    }
+  };
 
   return (
-    <ToolLayout
-      title="HTML Formatter"
-      slug="html-formatter"
-      category="HTML"
-      description="Format and beautify HTML code into a more readable, consistently indented structure."
-      howToUse={[
-        "Paste your HTML into the editor.",
-        "Click Format HTML.",
-        "Review the formatted HTML.",
-        "Copy the result into your project if needed.",
-      ]}
-      features={[
-        {
-          title: "Readable indentation",
-          description: "Organize HTML with consistent indentation.",
-        },
-        {
-          title: "Browser-based",
-          description: "Formatting happens directly in your browser.",
-        },
-        {
-          title: "Fast formatting",
-          description: "Format small and medium HTML snippets quickly.",
-        },
-        {
-          title: "Simple interface",
-          description: "Designed for everyday development tasks.",
-        },
-      ]}
-      example={{
-        input: "<div><h1>Hello</h1><p>Welcome</p></div>",
-        output: "<div>\n  <h1>Hello</h1>\n  <p>Welcome</p>\n</div>",
-      }}
-      whatIs={{
-        title: "HTML formatting",
-        paragraphs: [
-          "HTML formatting organizes markup using line breaks and indentation so developers can understand the document structure more easily.",
-          "Readable HTML is easier to inspect, maintain, debug, and review.",
-          "This tool provides lightweight browser-based formatting for common HTML snippets.",
-        ],
-      }}
-      useCases={[
-        "Cleaning copied HTML snippets.",
-        "Making minified HTML easier to read.",
-        "Reviewing markup during development.",
-        "Preparing HTML examples for documentation.",
-      ]}
-      faqs={[
-        {
-          question: "What is an HTML Formatter?",
-          answer:
-            "An HTML Formatter organizes HTML markup with indentation and line breaks to make the document easier to read and maintain.",
-        },
-        {
-          question: "How do I format HTML?",
-          answer:
-            "Paste your HTML into the editor and click Format. The tool will organize the markup into a more readable structure.",
-        },
-        {
-          question: "Does formatting change my HTML content?",
-          answer:
-            "Formatting primarily changes whitespace and indentation. It should not intentionally change the structure of valid HTML.",
-        },
-        {
-          question: "Can I format minified HTML?",
-          answer:
-            "Yes. An HTML formatter can add indentation and line breaks to minified or compressed markup.",
-        },
-        {
-          question: "Does the HTML Formatter upload my code?",
-          answer:
-            "No. The browser-based formatter can process your HTML locally without sending it to a server.",
-        },
-      ]}
-      relatedTools={[
-        {
-          name: "HTML Encoder",
-          slug: "html-encoder",
-          description: "Encode HTML special characters.",
-        },
-        {
-          name: "JSON Formatter",
-          slug: "json-formatter",
-          description: "Format JSON data.",
-        },
-      ]}
-    >
-      <div className="space-y-6">
-        <textarea
-          value={input}
-          onChange={(e) => setInput(e.target.value)}
-          placeholder="<div><h1>Hello</h1></div>"
-          spellCheck="false"
-          className="min-h-[260px] w-full rounded-xl border border-slate-200 bg-slate-950 p-5 font-mono text-sm leading-7 text-slate-100 outline-none placeholder:text-slate-600 focus:border-indigo-500"
-        />
+    <>
+      <SEO
+        title="HTML Formatter - Format HTML Online"
+        description="Format and indent HTML markup online with a browser-based HTML formatter."
+        canonical="/tools/html-formatter"
+      />
 
-        <button
-          onClick={() => setOutput(formatHTML(input))}
-          className="rounded-lg bg-indigo-600 px-5 py-3 font-semibold text-white hover:bg-indigo-700"
-        >
-          Format HTML
-        </button>
+      <ToolLayout
+        title="HTML Formatter"
+        description="Beautify and indent HTML markup to make nested elements easier to read and edit."
+        intro={
+          <>
+            <p>
+              HTML Formatter adds line breaks and indentation to HTML markup so
+              that nested elements are easier to understand. Readable markup can
+              make debugging, code review, and maintenance much simpler.
+            </p>
 
-        <pre className="min-h-[260px] overflow-x-auto rounded-xl bg-slate-950 p-5 font-mono text-sm leading-7 text-emerald-300">
-          {output || "// Formatted HTML will appear here"}
-        </pre>
-      </div>
-    </ToolLayout>
+            <p className="mt-5">
+              This lightweight formatter is designed for common HTML markup and
+              runs directly in your browser.
+            </p>
+          </>
+        }
+        howToUse={[
+          "Paste your HTML into the editor.",
+          "Click Format HTML.",
+          "Review the indented output.",
+          "Copy the formatted markup when ready.",
+        ]}
+        features={[
+          {
+            title: "Readable indentation",
+            description: "Nested elements are displayed with visual hierarchy.",
+          },
+          {
+            title: "Fast formatting",
+            description: "Format markup immediately without uploading a file.",
+          },
+          {
+            title: "Browser-based",
+            description: "The formatter works locally in the browser.",
+          },
+          {
+            title: "Copy output",
+            description: "Copy formatted HTML with one click.",
+          },
+        ]}
+        example={
+          <div className="p-5">
+            <pre className="rounded-xl bg-slate-950 p-4 text-sm leading-6 text-slate-200">
+              {`<div>
+  <h1>Hello</h1>
+  <p>Welcome to DevTools.</p>
+</div>`}
+            </pre>
+          </div>
+        }
+        aboutTitle="What Is HTML Formatting?"
+        aboutContent={
+          <>
+            <p>
+              HTML formatting is the process of arranging markup with consistent
+              indentation and line breaks. HTML itself generally does not
+              require indentation to represent its structure, but humans benefit
+              greatly from readable formatting.
+            </p>
+
+            <p>
+              Properly formatted HTML makes parent-child relationships between
+              elements easier to identify and can make structural problems
+              easier to diagnose.
+            </p>
+
+            <p>
+              Formatting is different from validation. A formatter can improve
+              presentation, while a dedicated HTML validator checks the markup
+              against HTML rules.
+            </p>
+          </>
+        }
+        useCases={[
+          {
+            title: "Code review",
+            description: "Make HTML changes easier to inspect and discuss.",
+          },
+          {
+            title: "Debugging",
+            description: "Improve visibility into nested markup structures.",
+          },
+          {
+            title: "Learning HTML",
+            description:
+              "Understand the hierarchy of HTML elements more easily.",
+          },
+          {
+            title: "Maintenance",
+            description: "Keep manually edited markup readable.",
+          },
+        ]}
+        faqItems={faqData["html-formatter"]}
+        relatedTools={relatedTools}
+      >
+        <div className="space-y-5">
+          <textarea
+            value={input}
+            onChange={(e) => {
+              setInput(e.target.value);
+              setError("");
+            }}
+            rows={14}
+            spellCheck={false}
+            className="w-full rounded-xl bg-slate-950 p-4 font-mono text-sm leading-6 text-slate-200 outline-none focus:ring-2 focus:ring-indigo-500"
+            placeholder="Paste HTML here..."
+          />
+
+          <div className="flex flex-wrap gap-3">
+            <button
+              type="button"
+              onClick={format}
+              className="inline-flex items-center gap-2 rounded-lg bg-indigo-600 px-5 py-2.5 text-sm font-semibold text-white hover:bg-indigo-700"
+            >
+              <Braces size={17} />
+              Format HTML
+            </button>
+
+            <ClearButton
+              onClick={() => {
+                setInput("");
+                setOutput("");
+                setError("");
+              }}
+              disabled={!input && !output}
+            />
+          </div>
+
+          {error && (
+            <div className="flex gap-3 rounded-xl border border-red-200 bg-red-50 p-4 text-sm text-red-700">
+              <AlertCircle size={18} />
+              {error}
+            </div>
+          )}
+
+          {output && (
+            <div>
+              <div className="mb-2 flex items-center justify-between">
+                <h2 className="font-semibold">Formatted HTML</h2>
+                <CopyButton text={output} />
+              </div>
+
+              <pre className="max-h-[500px] overflow-auto rounded-xl bg-slate-950 p-4 font-mono text-sm leading-6 text-slate-200">
+                {output}
+              </pre>
+            </div>
+          )}
+        </div>
+      </ToolLayout>
+    </>
   );
 }

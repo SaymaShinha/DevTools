@@ -1,10 +1,25 @@
 import { useState } from "react";
-import { Copy, Check } from "lucide-react";
+import { ArrowRightLeft, AlertCircle } from "lucide-react";
+
+import SEO from "../../components/SEO.jsx";
 import ToolLayout from "../../components/ToolLayout.jsx";
+import CopyButton from "../../components/CopyButton.jsx";
+import ClearButton from "../../components/ClearButton.jsx";
+import { faqData } from "../../data/faq.js";
+import { tools } from "../../data/tools.js";
+
+const relatedTools = tools.filter((tool) =>
+  [
+    "/tools/base64-encoder",
+    "/tools/url-decoder",
+    "/tools/html-encoder",
+  ].includes(tool.path),
+);
 
 function decodeBase64(value) {
-  const binary = atob(value);
+  const binary = atob(value.trim());
   const bytes = Uint8Array.from(binary, (char) => char.charCodeAt(0));
+
   return new TextDecoder().decode(bytes);
 }
 
@@ -12,162 +27,202 @@ export default function Base64Decoder() {
   const [input, setInput] = useState("");
   const [output, setOutput] = useState("");
   const [error, setError] = useState("");
-  const [copied, setCopied] = useState(false);
 
   const decode = () => {
+    if (!input.trim()) {
+      setOutput("");
+      setError("Enter Base64 text to decode.");
+      return;
+    }
+
     try {
-      setOutput(decodeBase64(input.trim()));
+      setOutput(decodeBase64(input));
       setError("");
     } catch {
       setOutput("");
-      setError("The provided value is not valid Base64.");
+      setError("The supplied value is not valid Base64 text.");
     }
   };
 
-  const copy = async () => {
-    if (!output) return;
-
-    await navigator.clipboard.writeText(output);
-    setCopied(true);
-    setTimeout(() => setCopied(false), 1500);
-  };
-
   return (
-    <ToolLayout
-      title="Base64 Decoder"
-      slug="base64-decoder"
-      category="Encoding"
-      description="Decode Base64-encoded data back into readable text directly in your browser."
-      howToUse={[
-        "Paste a Base64-encoded value into the input box.",
-        "Click Decode Base64.",
-        "Review the decoded text.",
-        "Copy the result if needed.",
-      ]}
-      features={[
-        {
-          title: "Unicode support",
-          description: "Decode UTF-8 text correctly.",
-        },
-        {
-          title: "Error handling",
-          description: "Invalid Base64 input is reported clearly.",
-        },
-        {
-          title: "Copy output",
-          description: "Copy decoded text quickly.",
-        },
-        {
-          title: "No installation",
-          description: "Use the decoder directly from your browser.",
-        },
-      ]}
-      example={{
-        input: "SGVsbG8gV29ybGQ=",
-        output: "Hello World",
-      }}
-      whatIs={{
-        title: "Base64 decoding",
-        paragraphs: [
-          "Base64 decoding reverses Base64 encoding and converts the encoded representation back into its original byte or text representation.",
-          "It is frequently useful when inspecting API data, tokens, data URLs, and encoded application values.",
-        ],
-      }}
-      useCases={[
-        "Inspecting Base64 API values.",
-        "Reading encoded text.",
-        "Debugging data URLs.",
-        "Testing Base64 conversion.",
-      ]}
-      faqs={[
-        {
-          question: "What is Base64 decoding?",
-          answer:
-            "Base64 decoding converts Base64-encoded data back into its original byte representation or text when the encoded data represents text.",
-        },
-        {
-          question: "How do I decode Base64?",
-          answer:
-            "Paste the Base64 value into the input field and click Decode. The tool will attempt to convert it back into readable text.",
-        },
-        {
-          question: "Why does Base64 decoding sometimes fail?",
-          answer:
-            "Decoding can fail when the input contains invalid Base64 characters, an incorrect length, or corrupted data.",
-        },
-        {
-          question: "Is Base64 secure?",
-          answer:
-            "Base64 does not provide encryption or security. Anyone with the encoded value can decode it.",
-        },
-        {
-          question: "Can Base64 contain binary data?",
-          answer:
-            "Yes. Base64 is commonly used to represent binary data as text, although this tool is primarily intended for text-based conversions.",
-        },
-      ]}
-      relatedTools={[
-        {
-          name: "Base64 Encoder",
-          slug: "base64-encoder",
-          description: "Encode text into Base64.",
-        },
-        {
-          name: "URL Decoder",
-          slug: "url-decoder",
-          description: "Decode URL-encoded text.",
-        },
-      ]}
-    >
-      <div className="space-y-6">
-        <div>
-          <label className="mb-2 block font-semibold text-slate-900">
-            Base64 Input
-          </label>
+    <>
+      <SEO
+        title="Base64 Decoder - Decode Base64 Online"
+        description="Decode Base64 text online using a browser-based Base64 decoder with UTF-8 support."
+        canonical="/tools/base64-decoder"
+      />
 
+      <ToolLayout
+        title="Base64 Decoder"
+        description="Decode Base64 text into readable text directly in your browser."
+        intro={
+          <>
+            <p>
+              Base64 Decoder reverses Base64 text encoding when the encoded
+              value represents text. It is useful when inspecting API values,
+              encoded configuration data, and other text representations.
+            </p>
+
+            <p className="mt-5">
+              Decoding is different from decryption. Base64 does not contain a
+              secret key, so decoding a Base64 value does not require a password
+              or cryptographic key.
+            </p>
+          </>
+        }
+        howToUse={[
+          "Paste a Base64 value into the input box.",
+          "Click Decode Base64.",
+          "Review the decoded text.",
+          "Copy the result if you need to use it elsewhere.",
+        ]}
+        features={[
+          {
+            title: "UTF-8 text",
+            description: "Decode Base64 values representing UTF-8 text.",
+          },
+          {
+            title: "Fast results",
+            description: "The conversion happens immediately in the browser.",
+          },
+          {
+            title: "Error handling",
+            description:
+              "Invalid Base64 input is reported instead of producing misleading output.",
+          },
+          {
+            title: "Copy output",
+            description: "Copy decoded text with a single click.",
+          },
+        ]}
+        example={
+          <div className="p-5">
+            <div className="grid gap-3 sm:grid-cols-2">
+              <div>
+                <p className="mb-2 text-sm font-semibold text-slate-700">
+                  Base64
+                </p>
+                <div className="rounded-lg bg-slate-950 p-4 font-mono text-sm text-slate-200">
+                  SGVsbG8gV29ybGQ=
+                </div>
+              </div>
+
+              <div>
+                <p className="mb-2 text-sm font-semibold text-slate-700">
+                  Decoded
+                </p>
+                <div className="rounded-lg bg-slate-950 p-4 font-mono text-sm text-slate-200">
+                  Hello World
+                </div>
+              </div>
+            </div>
+          </div>
+        }
+        aboutTitle="What Is Base64 Decoding?"
+        aboutContent={
+          <>
+            <p>
+              Base64 decoding reverses the representation created by Base64
+              encoding. A decoder maps Base64 characters back into bytes and
+              interprets those bytes according to the intended character
+              encoding.
+            </p>
+
+            <p>
+              Developers may need to decode Base64 while debugging API
+              responses, inspecting encoded values, or working with data URLs
+              and application payloads.
+            </p>
+
+            <p>
+              A decoded Base64 value is not automatically trustworthy. If the
+              source is unknown, treat decoded content carefully just as you
+              would any other external data.
+            </p>
+          </>
+        }
+        useCases={[
+          {
+            title: "API debugging",
+            description:
+              "Inspect Base64 values returned by APIs or application services.",
+          },
+          {
+            title: "Configuration",
+            description:
+              "Decode text-based configuration values that use Base64.",
+          },
+          {
+            title: "Learning",
+            description:
+              "Experiment with the relationship between encoded and decoded data.",
+          },
+          {
+            title: "Development",
+            description:
+              "Quickly inspect Base64 values without installing a separate application.",
+          },
+        ]}
+        faqItems={faqData["base64-decoder"]}
+        relatedTools={relatedTools}
+      >
+        <div className="space-y-5">
           <textarea
             value={input}
-            onChange={(e) => setInput(e.target.value)}
-            placeholder="SGVsbG8gV29ybGQ="
-            className="min-h-[220px] w-full rounded-xl border border-slate-200 bg-slate-950 p-5 font-mono text-sm text-slate-100 outline-none placeholder:text-slate-600 focus:border-indigo-500"
+            onChange={(e) => {
+              setInput(e.target.value);
+              setError("");
+            }}
+            rows={8}
+            className="w-full rounded-xl border border-slate-300 bg-slate-50 p-4 font-mono text-sm leading-7 outline-none focus:border-indigo-500 focus:ring-2 focus:ring-indigo-100"
+            placeholder="Paste Base64 here..."
           />
-        </div>
 
-        <button
-          onClick={decode}
-          className="rounded-lg bg-indigo-600 px-5 py-3 font-semibold text-white hover:bg-indigo-700"
-        >
-          Decode Base64
-        </button>
-
-        {error && (
-          <div className="rounded-xl border border-red-200 bg-red-50 p-4 text-sm text-red-700">
-            {error}
-          </div>
-        )}
-
-        <div>
-          <div className="mb-2 flex items-center justify-between">
-            <label className="font-semibold text-slate-900">Decoded Text</label>
-
+          <div className="flex flex-wrap gap-3">
             <button
-              onClick={copy}
-              disabled={!output}
-              className="inline-flex items-center gap-2 rounded-lg px-3 py-2 text-sm hover:bg-slate-100 disabled:opacity-40"
+              type="button"
+              onClick={decode}
+              className="inline-flex items-center gap-2 rounded-lg bg-indigo-600 px-5 py-2.5 text-sm font-semibold text-white hover:bg-indigo-700"
             >
-              {copied ? <Check size={16} /> : <Copy size={16} />}
-              {copied ? "Copied" : "Copy"}
+              <ArrowRightLeft size={17} />
+              Decode Base64
             </button>
+
+            <ClearButton
+              onClick={() => {
+                setInput("");
+                setOutput("");
+                setError("");
+              }}
+              disabled={!input && !output}
+            />
           </div>
 
-          <textarea
-            readOnly
-            value={output}
-            placeholder="Decoded text..."
-            className="min-h-[180px] w-full rounded-xl border border-slate-200 bg-slate-950 p-5 font-mono text-sm text-emerald-300 outline-none placeholder:text-slate-600"
-          />
+          {error && (
+            <div className="flex gap-3 rounded-xl border border-red-200 bg-red-50 p-4 text-sm text-red-700">
+              <AlertCircle size={18} />
+              {error}
+            </div>
+          )}
+
+          {output && (
+            <div>
+              <div className="mb-2 flex items-center justify-between">
+                <h2 className="font-semibold text-slate-900">Decoded Result</h2>
+
+                <CopyButton text={output} />
+              </div>
+
+              <textarea
+                value={output}
+                readOnly
+                rows={8}
+                className="w-full rounded-xl border border-slate-200 bg-slate-950 p-4 text-sm leading-7 text-slate-200 outline-none"
+              />
+            </div>
+          )}
         </div>
-      </div>
-    </ToolLayout>
+      </ToolLayout>
+    </>
   );
 }

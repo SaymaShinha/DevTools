@@ -6,7 +6,7 @@ export default function TermsOfUse() {
       <SEO
         title="Terms of Use - DevTools"
         description="Read the terms of use for DevTools."
-        canonical="https://yourdomain.com/terms-of-use"
+        canonical="https://devtools-toolkit.vercel.app/terms-of-use"
       />
 
       <main className="mx-auto max-w-4xl px-4 py-16">

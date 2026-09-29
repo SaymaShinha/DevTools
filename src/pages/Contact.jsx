@@ -112,7 +112,7 @@ export default function Contact() {
       <SEO
         title="Contact DevTools | Get in Touch"
         description="Contact DevTools with questions, suggestions, feedback, or reports about our free online developer tools."
-        canonical="https://yourdomain.com/contact"
+        canonical="https://devtools-toolkit.vercel.app/contact"
       />
 
       <main className="min-h-screen bg-slate-50">

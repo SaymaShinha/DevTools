@@ -6,7 +6,7 @@ export default function PrivacyPolicy() {
       <SEO
         title="Privacy Policy - DevTools"
         description="Read the DevTools privacy policy."
-        canonical="https://yourdomain.com/privacy-policy"
+        canonical="https://devtools-toolkit.vercel.app/privacy-policy"
       />
 
       <main className="mx-auto max-w-4xl px-4 py-16">

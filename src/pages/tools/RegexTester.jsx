@@ -1,218 +1,291 @@
-import { useState } from "react";
+import { useMemo, useState } from "react";
+import { AlertCircle, CheckCircle2, Regex } from "lucide-react";
+
+import SEO from "../../components/SEO.jsx";
 import ToolLayout from "../../components/ToolLayout.jsx";
+import ClearButton from "../../components/ClearButton.jsx";
+import { faqData } from "../../data/faq.js";
+import { tools } from "../../data/tools.js";
+
+const relatedTools = tools.filter((tool) =>
+  [
+    "/tools/text-case-converter",
+    "/tools/word-counter",
+    "/tools/json-validator",
+  ].includes(tool.path),
+);
 
 export default function RegexTester() {
   const [pattern, setPattern] = useState("");
   const [flags, setFlags] = useState("g");
   const [text, setText] = useState("");
-  const [result, setResult] = useState(null);
 
-  const testRegex = () => {
+  const result = useMemo(() => {
     if (!pattern) {
-      setResult({
-        error: "Enter a regular expression pattern.",
-      });
-      return;
+      return {
+        status: "empty",
+        matches: [],
+        error: "",
+      };
     }
 
     try {
       const regex = new RegExp(pattern, flags);
+      const matches = [];
 
-      const matches = [...text.matchAll(regex)].map((match) => ({
-        value: match[0],
-        index: match.index,
-      }));
+      if (regex.global) {
+        for (const match of text.matchAll(regex)) {
+          matches.push({
+            value: match[0],
+            index: match.index,
+          });
 
-      if (!flags.includes("g")) {
+          if (matches.length >= 500) {
+            break;
+          }
+        }
+      } else {
         const match = regex.exec(text);
 
-        setResult({
-          matches: match ? [{ value: match[0], index: match.index }] : [],
-        });
-
-        return;
+        if (match) {
+          matches.push({
+            value: match[0],
+            index: match.index,
+          });
+        }
       }
 
-      setResult({ matches });
+      return {
+        status: "valid",
+        matches,
+        error: "",
+      };
     } catch (error) {
-      setResult({
-        error: error.message,
-      });
+      return {
+        status: "invalid",
+        matches: [],
+        error: error.message || "Invalid regular expression.",
+      };
     }
-  };
+  }, [pattern, flags, text]);
 
   return (
-    <ToolLayout
-      title="Regex Tester"
-      slug="regex-tester"
-      category="Testing"
-      description="Test regular expressions against text and inspect matches directly in your browser."
-      howToUse={[
-        "Enter a regular expression pattern.",
-        "Choose the appropriate regex flags.",
-        "Enter the text you want to test.",
-        "Click Test Regex to see matching results.",
-      ]}
-      features={[
-        {
-          title: "Regex flags",
-          description: "Support common JavaScript regular expression flags.",
-        },
-        {
-          title: "Match results",
-          description: "View matching values and their positions.",
-        },
-        {
-          title: "Error detection",
-          description: "Invalid regular expressions are reported.",
-        },
-        {
-          title: "Browser-based",
-          description: "Testing happens locally in your browser.",
-        },
-      ]}
-      example={{
-        input: "/\\d+/g against 'Order 123'",
-        output: "Match: 123",
-      }}
-      whatIs={{
-        title: "regular expressions",
-        paragraphs: [
-          "A regular expression, often called regex or regexp, is a pattern used to search, match, and manipulate text.",
-          "Regular expressions are supported by many programming languages and are commonly used for validation, searching, parsing, and text processing.",
-        ],
-      }}
-      useCases={[
-        "Testing input validation patterns.",
-        "Finding patterns in text.",
-        "Checking email or identifier patterns.",
-        "Developing text-processing code.",
-      ]}
-      faqs={[
-        {
-          question: "What is a regular expression?",
-          answer:
-            "A regular expression, or regex, is a pattern used to search, match, validate, or manipulate text.",
-        },
-        {
-          question: "How do I test a regular expression?",
-          answer:
-            "Enter your regular expression pattern, select the required flags, provide test text, and run the test to see matching results.",
-        },
-        {
-          question: "What are regex flags?",
-          answer:
-            "Flags modify how a regular expression behaves. Common flags include g for global matching, i for case-insensitive matching, and m for multiline matching.",
-        },
-        {
-          question: "Why does my regular expression return no matches?",
-          answer:
-            "The pattern may not match the supplied text, or the pattern, escaping, or flags may not be what you intended. Check the pattern and test text carefully.",
-        },
-        {
-          question: "Is regex the same in every programming language?",
-          answer:
-            "No. Many programming languages share common regular-expression concepts, but syntax and supported features can differ between regex engines.",
-        },
-      ]}
-      relatedTools={[
-        {
-          name: "Text Case Converter",
-          slug: "text-case-converter",
-          description: "Convert text capitalization.",
-        },
-        {
-          name: "Word Counter",
-          slug: "word-counter",
-          description: "Analyze text statistics.",
-        },
-      ]}
-    >
-      <div className="space-y-6">
-        <div className="grid gap-4 sm:grid-cols-[1fr_180px]">
-          <div>
-            <label className="mb-2 block font-semibold text-slate-900">
-              Regular Expression
-            </label>
+    <>
+      <SEO
+        title="Regex Tester - Test Regular Expressions Online"
+        description="Test JavaScript regular expressions against sample text with matches, indexes, flags, and error feedback."
+        canonical="/tools/regex-tester"
+      />
 
-            <input
-              value={pattern}
-              onChange={(e) => setPattern(e.target.value)}
-              placeholder="\\d+"
-              className="w-full rounded-xl border border-slate-200 bg-slate-950 px-4 py-3 font-mono text-sm text-slate-100 outline-none placeholder:text-slate-600 focus:border-indigo-500"
-            />
+      <ToolLayout
+        title="Regex Tester"
+        description="Test regular expressions against sample text and inspect matching results directly in your browser."
+        intro={
+          <>
+            <p>
+              Regular expressions, commonly called regex, are patterns used to
+              search and match text. They are useful for tasks such as finding
+              repeated structures, validating formatted values, and extracting
+              information from strings.
+            </p>
+
+            <p className="mt-5">
+              This tester uses JavaScript's regular expression engine, so the
+              pattern and flags follow JavaScript regex behavior.
+            </p>
+          </>
+        }
+        howToUse={[
+          "Enter a regular expression pattern without surrounding slashes.",
+          "Choose the JavaScript flags you need.",
+          "Enter sample text to test.",
+          "Review the matches and their positions.",
+        ]}
+        features={[
+          {
+            title: "JavaScript regex",
+            description:
+              "Test patterns using the browser's JavaScript RegExp engine.",
+          },
+          {
+            title: "Flags",
+            description:
+              "Test patterns with flags such as global and case-insensitive matching.",
+          },
+          {
+            title: "Match positions",
+            description: "See where each match begins in the test text.",
+          },
+          {
+            title: "Syntax feedback",
+            description:
+              "Invalid patterns are reported instead of being executed.",
+          },
+        ]}
+        example={
+          <div className="p-5">
+            <p className="text-sm font-semibold text-slate-700">
+              Example pattern
+            </p>
+
+            <div className="mt-3 rounded-xl bg-slate-950 p-4 font-mono text-sm text-slate-200">
+              \d+
+            </div>
+
+            <p className="mt-4 text-sm leading-7 text-slate-600">
+              The pattern <code>\d+</code> commonly matches one or more digit
+              characters. For example, it can find <code>123</code> inside a
+              sentence containing a number.
+            </p>
           </div>
+        }
+        aboutTitle="What Is a Regular Expression?"
+        aboutContent={
+          <>
+            <p>
+              A regular expression describes a pattern that a text-processing
+              engine can search for. Patterns can contain literal characters,
+              character classes, quantifiers, groups, anchors, and other
+              constructs.
+            </p>
 
-          <div>
-            <label className="mb-2 block font-semibold text-slate-900">
-              Flags
-            </label>
+            <p>
+              JavaScript provides regular expressions through the
+              <code className="mx-1">RegExp</code> object and regular expression
+              literals. Flags modify matching behavior; for example, the global
+              flag allows repeated matches.
+            </p>
 
-            <input
-              value={flags}
-              onChange={(e) => setFlags(e.target.value)}
-              placeholder="g"
-              className="w-full rounded-xl border border-slate-200 px-4 py-3 font-mono text-sm text-slate-900 outline-none focus:border-indigo-500"
-            />
-          </div>
-        </div>
+            <p>
+              Regex is powerful, but complicated patterns can become difficult
+              to maintain. For important validation tasks, regex is often best
+              combined with ordinary application-level validation.
+            </p>
+          </>
+        }
+        useCases={[
+          {
+            title: "Form validation",
+            description: "Experiment with patterns for structured text fields.",
+          },
+          {
+            title: "Text extraction",
+            description: "Find repeated structures inside sample text.",
+          },
+          {
+            title: "Log analysis",
+            description: "Test patterns for identifying useful log entries.",
+          },
+          {
+            title: "Learning regex",
+            description:
+              "Experiment with patterns and immediately inspect matches.",
+          },
+        ]}
+        faqItems={faqData["regex-tester"]}
+        relatedTools={relatedTools}
+      >
+        <div className="space-y-5">
+          <div className="grid gap-4 md:grid-cols-[1fr_180px]">
+            <div>
+              <label className="mb-2 block text-sm font-semibold text-slate-700">
+                Regular Expression
+              </label>
 
-        <div>
-          <label className="mb-2 block font-semibold text-slate-900">
-            Test Text
-          </label>
+              <input
+                value={pattern}
+                onChange={(e) => setPattern(e.target.value)}
+                className="w-full rounded-xl border border-slate-300 bg-slate-50 p-4 font-mono text-sm outline-none focus:border-indigo-500 focus:ring-2 focus:ring-indigo-100"
+                placeholder="\d+"
+              />
+            </div>
 
-          <textarea
-            value={text}
-            onChange={(e) => setText(e.target.value)}
-            placeholder="Enter text to test..."
-            className="min-h-[220px] w-full rounded-xl border border-slate-200 bg-white p-5 font-mono text-sm text-slate-900 outline-none focus:border-indigo-500 focus:ring-4 focus:ring-indigo-100"
-          />
-        </div>
+            <div>
+              <label className="mb-2 block text-sm font-semibold text-slate-700">
+                Flags
+              </label>
 
-        <button
-          onClick={testRegex}
-          className="rounded-lg bg-indigo-600 px-5 py-3 font-semibold text-white hover:bg-indigo-700"
-        >
-          Test Regex
-        </button>
-
-        {result?.error && (
-          <div className="rounded-xl border border-red-200 bg-red-50 p-4 text-sm text-red-700">
-            {result.error}
-          </div>
-        )}
-
-        {result && !result.error && (
-          <div className="rounded-xl border border-slate-200 bg-slate-50 p-5">
-            <h3 className="font-semibold text-slate-900">
-              {result.matches.length}{" "}
-              {result.matches.length === 1 ? "match" : "matches"} found
-            </h3>
-
-            <div className="mt-4 space-y-2">
-              {result.matches.length > 0 ? (
-                result.matches.map((match, index) => (
-                  <div
-                    key={`${match.index}-${index}`}
-                    className="flex flex-col gap-1 rounded-lg bg-white p-4 sm:flex-row sm:items-center sm:justify-between"
-                  >
-                    <code className="font-mono text-indigo-700">
-                      {match.value}
-                    </code>
-
-                    <span className="text-sm text-slate-500">
-                      Position: {match.index}
-                    </span>
-                  </div>
-                ))
-              ) : (
-                <p className="text-sm text-slate-500">No matches found.</p>
-              )}
+              <input
+                value={flags}
+                onChange={(e) => setFlags(e.target.value)}
+                className="w-full rounded-xl border border-slate-300 bg-slate-50 p-4 font-mono text-sm outline-none focus:border-indigo-500 focus:ring-2 focus:ring-indigo-100"
+                placeholder="g"
+              />
             </div>
           </div>
-        )}
-      </div>
-    </ToolLayout>
+
+          <div>
+            <label className="mb-2 block text-sm font-semibold text-slate-700">
+              Test Text
+            </label>
+
+            <textarea
+              value={text}
+              onChange={(e) => setText(e.target.value)}
+              rows={10}
+              className="w-full rounded-xl border border-slate-300 bg-slate-50 p-4 text-sm leading-7 outline-none focus:border-indigo-500 focus:ring-2 focus:ring-indigo-100"
+              placeholder="Enter text to test against your pattern..."
+            />
+          </div>
+
+          {result.status === "valid" && pattern && (
+            <div className="flex items-center gap-2 rounded-xl border border-green-200 bg-green-50 p-4 text-sm text-green-700">
+              <CheckCircle2 size={18} />
+              Valid regular expression
+            </div>
+          )}
+
+          {result.status === "invalid" && (
+            <div className="flex gap-3 rounded-xl border border-red-200 bg-red-50 p-4 text-sm text-red-700">
+              <AlertCircle size={18} />
+              <span>{result.error}</span>
+            </div>
+          )}
+
+          {result.status === "valid" && pattern && (
+            <div className="rounded-xl border border-slate-200 bg-slate-50 p-5">
+              <div className="flex items-center gap-2">
+                <Regex size={18} className="text-indigo-600" />
+                <h2 className="font-semibold text-slate-900">
+                  Matches: {result.matches.length}
+                </h2>
+              </div>
+
+              {result.matches.length > 0 ? (
+                <div className="mt-4 space-y-2">
+                  {result.matches.map((match, index) => (
+                    <div
+                      key={`${match.index}-${index}`}
+                      className="flex flex-col gap-2 rounded-lg border border-slate-200 bg-white p-3 sm:flex-row sm:items-center sm:justify-between"
+                    >
+                      <code className="break-all text-sm text-slate-900">
+                        {match.value || "(empty match)"}
+                      </code>
+
+                      <span className="text-xs text-slate-500">
+                        Index: {match.index}
+                      </span>
+                    </div>
+                  ))}
+                </div>
+              ) : (
+                <p className="mt-4 text-sm text-slate-600">
+                  No matches found in the supplied text.
+                </p>
+              )}
+            </div>
+          )}
+
+          <ClearButton
+            onClick={() => {
+              setPattern("");
+              setFlags("g");
+              setText("");
+            }}
+            disabled={!pattern && !text}
+          />
+        </div>
+      </ToolLayout>
+    </>
   );
 }

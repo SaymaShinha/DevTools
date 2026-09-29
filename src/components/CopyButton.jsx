@@ -1,36 +1,44 @@
 import { useState } from "react";
 import { Check, Copy } from "lucide-react";
 
-export default function CopyButton({ text }) {
+export default function CopyButton({
+  text = "",
+  label = "Copy",
+}) {
   const [copied, setCopied] = useState(false);
 
-  const copy = async () => {
+  const handleCopy = async () => {
     if (!text) return;
 
-    await navigator.clipboard.writeText(text);
+    try {
+      await navigator.clipboard.writeText(text);
 
-    setCopied(true);
+      setCopied(true);
 
-    setTimeout(() => {
+      setTimeout(() => {
+        setCopied(false);
+      }, 1500);
+    } catch {
       setCopied(false);
-    }, 1500);
+    }
   };
 
   return (
     <button
-      onClick={copy}
+      type="button"
+      onClick={handleCopy}
       disabled={!text}
-      className="btn-secondary disabled:cursor-not-allowed disabled:opacity-50"
+      className="inline-flex items-center gap-2 rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm font-medium text-slate-700 transition hover:bg-slate-50 disabled:cursor-not-allowed disabled:opacity-50"
     >
       {copied ? (
         <>
-          <Check size={17} />
+          <Check size={16} />
           Copied
         </>
       ) : (
         <>
-          <Copy size={17} />
-          Copy
+          <Copy size={16} />
+          {label}
         </>
       )}
     </button>

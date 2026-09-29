@@ -1,219 +1,262 @@
-import { useState } from "react";
+import { useMemo, useState } from "react";
+import { Clock3, ArrowDown } from "lucide-react";
+
+import SEO from "../../components/SEO.jsx";
 import ToolLayout from "../../components/ToolLayout.jsx";
+import CopyButton from "../../components/CopyButton.jsx";
+import ClearButton from "../../components/ClearButton.jsx";
+import { faqData } from "../../data/faq.js";
+import { tools } from "../../data/tools.js";
 
-function hexToRgb(hex) {
-  let value = hex.replace("#", "");
+const relatedTools = tools.filter((tool) =>
+  [
+    "/tools/uuid-generator",
+    "/tools/json-formatter",
+    "/tools/text-case-converter",
+  ].includes(tool.path),
+);
 
-  if (value.length === 3) {
-    value = value
-      .split("")
-      .map((x) => x + x)
-      .join("");
-  }
+export default function TimestampConverter() {
+  const [timestamp, setTimestamp] = useState("");
+  const [unit, setUnit] = useState("seconds");
+  const [dateValue, setDateValue] = useState(
+    new Date().toISOString().slice(0, 16),
+  );
+  const [error, setError] = useState("");
 
-  if (!/^[0-9a-fA-F]{6}$/.test(value)) return null;
+  const convertedDate = useMemo(() => {
+    if (!timestamp.trim()) return "";
 
-  return {
-    r: parseInt(value.slice(0, 2), 16),
-    g: parseInt(value.slice(2, 4), 16),
-    b: parseInt(value.slice(4, 6), 16),
-  };
-}
+    const number = Number(timestamp);
 
-function rgbToHsl(r, g, b) {
-  r /= 255;
-  g /= 255;
-  b /= 255;
+    if (!Number.isFinite(number)) return "";
 
-  const max = Math.max(r, g, b);
-  const min = Math.min(r, g, b);
+    const milliseconds = unit === "seconds" ? number * 1000 : number;
 
-  let h;
-  let s;
-  const l = (max + min) / 2;
+    const date = new Date(milliseconds);
 
-  if (max === min) {
-    h = s = 0;
-  } else {
-    const d = max - min;
+    if (Number.isNaN(date.getTime())) return "";
 
-    s = l > 0.5 ? d / (2 - max - min) : d / (max + min);
+    return date.toISOString();
+  }, [timestamp, unit]);
 
-    switch (max) {
-      case r:
-        h = (g - b) / d + (g < b ? 6 : 0);
-        break;
+  const timestampFromDate = useMemo(() => {
+    if (!dateValue) return "";
 
-      case g:
-        h = (b - r) / d + 2;
-        break;
+    const milliseconds = new Date(dateValue).getTime();
 
-      default:
-        h = (r - g) / d + 4;
+    if (Number.isNaN(milliseconds)) return "";
+
+    return Math.floor(milliseconds / 1000);
+  }, [dateValue]);
+
+  const convert = () => {
+    if (!timestamp.trim()) {
+      setError("Enter a timestamp.");
+      return;
     }
 
-    h /= 6;
-  }
+    const number = Number(timestamp);
 
-  return {
-    h: Math.round(h * 360),
-    s: Math.round(s * 100),
-    l: Math.round(l * 100),
+    if (!Number.isFinite(number)) {
+      setError("Enter a valid numeric timestamp.");
+      return;
+    }
+
+    setError("");
   };
-}
-
-export default function ColorConverter() {
-  const [hex, setHex] = useState("#4F46E5");
-  const rgb = hexToRgb(hex);
-  const hsl = rgb ? rgbToHsl(rgb.r, rgb.g, rgb.b) : null;
 
   return (
-    <ToolLayout
-      title="Color Converter"
-      slug="color-converter"
-      category="Developer Utilities"
-      description="Convert HEX colors into RGB and HSL values with a simple browser-based color converter."
-      howToUse={[
-        "Enter a valid HEX color.",
-        "The tool automatically calculates the RGB values.",
-        "The corresponding HSL values are also displayed.",
-      ]}
-      features={[
-        {
-          title: "HEX to RGB",
-          description: "Convert hexadecimal colors to RGB.",
-        },
-        {
-          title: "HEX to HSL",
-          description: "Generate HSL values from a HEX color.",
-        },
-        {
-          title: "Color preview",
-          description: "See the selected color visually.",
-        },
-        {
-          title: "Browser-based",
-          description: "Conversions happen locally.",
-        },
-      ]}
-      example={{
-        input: "#4F46E5",
-        output: "RGB(79, 70, 229) • HSL(243, 76%, 59%)",
-      }}
-      whatIs={{
-        title: "color formats",
-        paragraphs: [
-          "HEX, RGB, and HSL are common ways of representing colors in digital design and web development.",
-          "HEX uses hexadecimal values, RGB describes red, green, and blue components, while HSL represents hue, saturation, and lightness.",
-        ],
-      }}
-      useCases={[
-        "Converting CSS colors.",
-        "Working with design systems.",
-        "Creating CSS variables.",
-        "Translating colors between design tools and code.",
-      ]}
-      faqs={[
-        {
-          question: "What is a color converter?",
-          answer:
-            "A color converter changes color values between formats such as HEX, RGB, and HSL.",
-        },
-        {
-          question: "What is HEX color?",
-          answer:
-            "HEX represents a color using hexadecimal values, commonly written in a format such as #4F46E5.",
-        },
-        {
-          question: "What is RGB?",
-          answer:
-            "RGB represents a color using red, green, and blue components. Each component commonly ranges from 0 to 255.",
-        },
-        {
-          question: "What is HSL?",
-          answer:
-            "HSL represents a color using hue, saturation, and lightness, which can make certain color adjustments easier to understand.",
-        },
-        {
-          question: "Are the converted colors exact?",
-          answer:
-            "Conversions between standard HEX, RGB, and HSL representations describe the same color, although rounding can sometimes cause very small numerical differences.",
-        },
-      ]}
-      relatedTools={[
-        {
-          name: "Text Case Converter",
-          slug: "text-case-converter",
-          description: "Convert text between different cases.",
-        },
-        {
-          name: "HTML Formatter",
-          slug: "html-formatter",
-          description: "Format HTML code.",
-        },
-      ]}
-    >
-      <div className="space-y-8">
-        <div className="flex flex-col gap-5 sm:flex-row sm:items-center">
-          <input
-            type="color"
-            value={/^#[0-9a-fA-F]{6}$/.test(hex) ? hex : "#4F46E5"}
-            onChange={(e) => setHex(e.target.value)}
-            className="h-24 w-24 cursor-pointer rounded-xl border-0 bg-transparent"
-          />
+    <>
+      <SEO
+        title="Timestamp Converter - Unix Timestamp Converter"
+        description="Convert Unix timestamps to readable dates and convert dates to Unix timestamps with a browser-based timestamp converter."
+        canonical="/tools/timestamp-converter"
+      />
 
-          <div className="flex-1">
-            <label className="mb-2 block font-semibold text-slate-900">
-              HEX Color
-            </label>
+      <ToolLayout
+        title="Timestamp Converter"
+        description="Convert Unix timestamps and human-readable dates quickly in your browser."
+        intro={
+          <>
+            <p>
+              A Unix timestamp represents a point in time relative to the Unix
+              epoch. Depending on the system, timestamps are commonly stored in
+              seconds or milliseconds.
+            </p>
+
+            <p className="mt-5">
+              This converter lets you interpret numeric timestamps as UTC dates
+              and also create a Unix timestamp from a selected date and time.
+            </p>
+          </>
+        }
+        howToUse={[
+          "Enter a Unix timestamp.",
+          "Choose whether the value is in seconds or milliseconds.",
+          "Review the corresponding UTC date.",
+          "Use the date-to-timestamp section when you need to convert a date in the other direction.",
+        ]}
+        features={[
+          {
+            title: "Seconds and milliseconds",
+            description: "Choose the unit used by your timestamp.",
+          },
+          {
+            title: "UTC output",
+            description:
+              "Display the corresponding date using ISO/UTC formatting.",
+          },
+          {
+            title: "Date to timestamp",
+            description:
+              "Convert a selected date and time into a Unix timestamp.",
+          },
+          {
+            title: "Browser-based",
+            description: "Conversion takes place directly in the browser.",
+          },
+        ]}
+        example={
+          <div className="p-5">
+            <div className="grid gap-3 sm:grid-cols-2">
+              <div className="rounded-lg bg-slate-950 p-4 font-mono text-sm text-slate-200">
+                1704067200
+              </div>
+
+              <div className="rounded-lg bg-slate-950 p-4 font-mono text-sm text-slate-200">
+                2024-01-01T00:00:00.000Z
+              </div>
+            </div>
+          </div>
+        }
+        aboutTitle="What Is a Unix Timestamp?"
+        aboutContent={
+          <>
+            <p>
+              The Unix epoch begins at January 1, 1970 at 00:00:00 UTC. A Unix
+              timestamp represents time as an offset from that reference point.
+            </p>
+
+            <p>
+              Seconds are common in many APIs and command-line environments,
+              while JavaScript's Date API uses milliseconds internally.
+              Confusing these units can result in dates that are far in the past
+              or future.
+            </p>
+
+            <p>
+              The timestamp itself represents a point in time; the way that
+              point is displayed can depend on the selected time zone.
+            </p>
+          </>
+        }
+        useCases={[
+          {
+            title: "API development",
+            description: "Inspect timestamp values returned by APIs.",
+          },
+          {
+            title: "Database debugging",
+            description:
+              "Interpret stored Unix timestamps during troubleshooting.",
+          },
+          {
+            title: "Log analysis",
+            description: "Turn numeric timestamps into human-readable dates.",
+          },
+          {
+            title: "Testing",
+            description: "Create timestamps for sample data and test cases.",
+          },
+        ]}
+        faqItems={faqData["timestamp-converter"]}
+        relatedTools={relatedTools}
+      >
+        <div className="space-y-8">
+          <section>
+            <div className="mb-4 flex items-center gap-2">
+              <Clock3 size={19} className="text-indigo-600" />
+              <h2 className="font-semibold text-slate-900">
+                Timestamp to Date
+              </h2>
+            </div>
+
+            <div className="grid gap-4 sm:grid-cols-[1fr_180px]">
+              <input
+                value={timestamp}
+                onChange={(e) => {
+                  setTimestamp(e.target.value);
+                  setError("");
+                }}
+                className="rounded-xl border border-slate-300 bg-slate-50 p-4 font-mono text-sm outline-none focus:border-indigo-500 focus:ring-2 focus:ring-indigo-100"
+                placeholder="1704067200"
+              />
+
+              <select
+                value={unit}
+                onChange={(e) => setUnit(e.target.value)}
+                className="rounded-xl border border-slate-300 bg-white p-4 text-sm outline-none focus:border-indigo-500"
+              >
+                <option value="seconds">Seconds</option>
+                <option value="milliseconds">Milliseconds</option>
+              </select>
+            </div>
+
+            <button
+              type="button"
+              onClick={convert}
+              className="mt-4 rounded-lg bg-indigo-600 px-5 py-2.5 text-sm font-semibold text-white hover:bg-indigo-700"
+            >
+              Convert
+            </button>
+
+            {error && <p className="mt-3 text-sm text-red-600">{error}</p>}
+
+            {convertedDate && (
+              <div className="mt-4 flex items-center justify-between gap-4 rounded-xl bg-slate-950 p-4">
+                <code className="break-all text-sm text-slate-200">
+                  {convertedDate}
+                </code>
+
+                <CopyButton text={convertedDate} />
+              </div>
+            )}
+          </section>
+
+          <section className="border-t border-slate-200 pt-8">
+            <div className="mb-4 flex items-center gap-2">
+              <ArrowDown size={19} className="text-indigo-600" />
+              <h2 className="font-semibold text-slate-900">
+                Date to Unix Timestamp
+              </h2>
+            </div>
 
             <input
-              value={hex}
-              onChange={(e) => setHex(e.target.value)}
-              placeholder="#4F46E5"
-              className="w-full rounded-xl border border-slate-200 px-4 py-3 font-mono uppercase outline-none focus:border-indigo-500 focus:ring-4 focus:ring-indigo-100"
+              type="datetime-local"
+              value={dateValue}
+              onChange={(e) => setDateValue(e.target.value)}
+              className="w-full rounded-xl border border-slate-300 bg-white p-4 text-sm outline-none focus:border-indigo-500"
             />
-          </div>
+
+            <div className="mt-4 flex items-center justify-between gap-4 rounded-xl bg-slate-950 p-4">
+              <code className="text-sm text-slate-200">
+                {timestampFromDate}
+              </code>
+
+              <CopyButton text={String(timestampFromDate)} />
+            </div>
+          </section>
+
+          <ClearButton
+            onClick={() => {
+              setTimestamp("");
+              setError("");
+            }}
+            disabled={!timestamp}
+          />
         </div>
-
-        {rgb && hsl ? (
-          <div className="grid gap-4 sm:grid-cols-3">
-            <div className="rounded-xl border border-slate-200 bg-slate-50 p-5">
-              <p className="text-sm text-slate-500">HEX</p>
-              <p className="mt-2 font-mono font-semibold text-slate-900">
-                #{hex.replace("#", "").toUpperCase()}
-              </p>
-            </div>
-
-            <div className="rounded-xl border border-slate-200 bg-slate-50 p-5">
-              <p className="text-sm text-slate-500">RGB</p>
-              <p className="mt-2 font-mono font-semibold text-slate-900">
-                rgb({rgb.r}, {rgb.g}, {rgb.b})
-              </p>
-            </div>
-
-            <div className="rounded-xl border border-slate-200 bg-slate-50 p-5">
-              <p className="text-sm text-slate-500">HSL</p>
-              <p className="mt-2 font-mono font-semibold text-slate-900">
-                hsl({hsl.h}, {hsl.s}%, {hsl.l}%)
-              </p>
-            </div>
-          </div>
-        ) : (
-          <div className="rounded-xl border border-red-200 bg-red-50 p-4 text-red-700">
-            Enter a valid six-digit HEX color.
-          </div>
-        )}
-
-        <div
-          className="h-32 rounded-2xl border border-slate-200 shadow-inner"
-          style={{
-            backgroundColor: rgb
-              ? `rgb(${rgb.r}, ${rgb.g}, ${rgb.b})`
-              : "#ffffff",
-          }}
-        />
-      </div>
-    </ToolLayout>
+      </ToolLayout>
+    </>
   );
 }

@@ -1,5 +1,20 @@
 import { useState } from "react";
+import { Link2, AlertCircle } from "lucide-react";
+
+import SEO from "../../components/SEO.jsx";
 import ToolLayout from "../../components/ToolLayout.jsx";
+import CopyButton from "../../components/CopyButton.jsx";
+import ClearButton from "../../components/ClearButton.jsx";
+import { faqData } from "../../data/faq.js";
+import { tools } from "../../data/tools.js";
+
+const relatedTools = tools.filter((tool) =>
+  [
+    "/tools/url-encoder",
+    "/tools/base64-decoder",
+    "/tools/html-encoder",
+  ].includes(tool.path),
+);
 
 export default function UrlDecoder() {
   const [input, setInput] = useState("");
@@ -7,129 +22,185 @@ export default function UrlDecoder() {
   const [error, setError] = useState("");
 
   const decode = () => {
+    if (!input) {
+      setOutput("");
+      setError("Enter URL-encoded text.");
+      return;
+    }
+
     try {
       setOutput(decodeURIComponent(input));
       setError("");
     } catch {
       setOutput("");
-      setError("The provided text contains an invalid URL encoding.");
+      setError("The input contains an invalid percent-encoded sequence.");
     }
   };
 
   return (
-    <ToolLayout
-      title="URL Decoder"
-      slug="url-decoder"
-      category="URL"
-      description="Decode percent-encoded URL text into readable characters directly in your browser."
-      howToUse={[
-        "Paste URL-encoded text into the input box.",
-        "Click Decode URL.",
-        "Review the decoded value.",
-      ]}
-      features={[
-        {
-          title: "Percent decoding",
-          description: "Decode percent-encoded URL components.",
-        },
-        {
-          title: "Error handling",
-          description: "Invalid encoding is reported clearly.",
-        },
-        {
-          title: "Fast conversion",
-          description: "Decode text instantly.",
-        },
-        {
-          title: "No installation",
-          description: "Runs directly in your browser.",
-        },
-      ]}
-      example={{
-        input: "hello%20world%20%26%20test",
-        output: "hello world & test",
-      }}
-      whatIs={{
-        title: "URL decoding",
-        paragraphs: [
-          "URL decoding reverses percent encoding and converts encoded characters back into their readable representation.",
-          "It is commonly used when inspecting query strings, links, API requests, and web application data.",
-        ],
-      }}
-      useCases={[
-        "Reading encoded query parameters.",
-        "Debugging API requests.",
-        "Inspecting URL strings.",
-        "Converting percent-encoded text back to readable text.",
-      ]}
-      faqs={[
-        {
-          question: "What is URL decoding?",
-          answer:
-            "URL decoding converts percent-encoded characters back into their readable representation.",
-        },
-        {
-          question: "How do I decode a URL?",
-          answer:
-            "Paste the encoded URL or URL component into the input field and click Decode.",
-        },
-        {
-          question: "What does %20 mean in a URL?",
-          answer:
-            "%20 is the percent-encoded representation of a space character.",
-        },
-        {
-          question: "Does URL decoding change the original website?",
-          answer:
-            "No. Decoding only converts the text into a more readable representation. It does not modify the original URL or website.",
-        },
-        {
-          question: "Can every URL be decoded?",
-          answer:
-            "A URL can be decoded when its encoded portions use valid percent-encoding. Invalid or malformed sequences may produce an error.",
-        },
-      ]}
-      relatedTools={[
-        {
-          name: "URL Encoder",
-          slug: "url-encoder",
-          description: "Encode text for URL components.",
-        },
-        {
-          name: "HTML Encoder",
-          slug: "html-encoder",
-          description: "Encode HTML special characters.",
-        },
-      ]}
-    >
-      <div className="space-y-6">
-        <textarea
-          value={input}
-          onChange={(e) => setInput(e.target.value)}
-          placeholder="hello%20world"
-          className="min-h-[220px] w-full rounded-xl border border-slate-200 bg-slate-950 p-5 font-mono text-sm text-slate-100 outline-none placeholder:text-slate-600 focus:border-indigo-500"
-        />
+    <>
+      <SEO
+        title="URL Decoder - Decode URLs Online"
+        description="Decode percent-encoded URL text online with a browser-based URL decoder."
+        canonical="/tools/url-decoder"
+      />
 
-        <button
-          onClick={decode}
-          className="rounded-lg bg-indigo-600 px-5 py-3 font-semibold text-white hover:bg-indigo-700"
-        >
-          Decode URL
-        </button>
+      <ToolLayout
+        title="URL Decoder"
+        description="Decode percent-encoded text and URL components into readable characters."
+        intro={
+          <>
+            <p>
+              URL Decoder reverses percent encoding by converting encoded
+              sequences such as <code>%20</code> and <code>%26</code> back into
+              their corresponding characters.
+            </p>
 
-        {error && (
-          <div className="rounded-xl border border-red-200 bg-red-50 p-4 text-sm text-red-700">
-            {error}
+            <p className="mt-5">
+              It is useful when inspecting URLs, query strings, API requests,
+              logs, and text copied from systems that encode URL components.
+            </p>
+          </>
+        }
+        howToUse={[
+          "Paste the encoded URL component or text.",
+          "Click Decode URL.",
+          "Review the readable result.",
+          "Copy the decoded value when needed.",
+        ]}
+        features={[
+          {
+            title: "Percent decoding",
+            description: "Converts percent-encoded sequences into characters.",
+          },
+          {
+            title: "Error detection",
+            description: "Reports malformed percent-encoded input.",
+          },
+          {
+            title: "Simple interface",
+            description: "Paste, decode, and copy without additional software.",
+          },
+          {
+            title: "Browser-based",
+            description: "The conversion is performed directly in the browser.",
+          },
+        ]}
+        example={
+          <div className="p-5">
+            <div className="grid gap-3 sm:grid-cols-2">
+              <div className="rounded-lg bg-slate-950 p-4 font-mono text-sm text-slate-200">
+                Hello%20World%20%26%20Developers
+              </div>
+
+              <div className="rounded-lg bg-slate-950 p-4 font-mono text-sm text-slate-200">
+                Hello World &amp; Developers
+              </div>
+            </div>
           </div>
-        )}
+        }
+        aboutTitle="What Is URL Decoding?"
+        aboutContent={
+          <>
+            <p>
+              URL decoding translates percent-encoded sequences back into
+              characters. Percent encoding is used because URLs have syntax
+              rules that make some characters unsuitable or ambiguous in certain
+              positions.
+            </p>
 
-        <textarea
-          readOnly
-          value={output}
-          placeholder="Decoded result..."
-          className="min-h-[180px] w-full rounded-xl border border-slate-200 bg-slate-950 p-5 font-mono text-sm text-emerald-300 outline-none"
-        />
-      </div>
-    </ToolLayout>
+            <p>
+              When debugging web applications, you may encounter encoded values
+              in browser addresses, server logs, API requests, or application
+              data.
+            </p>
+
+            <p>
+              The decoded result should be treated according to its context.
+              Decoding text does not validate that the resulting URL or value is
+              safe or meaningful.
+            </p>
+          </>
+        }
+        useCases={[
+          {
+            title: "URL debugging",
+            description:
+              "Inspect encoded values while troubleshooting links and requests.",
+          },
+          {
+            title: "API development",
+            description:
+              "Read encoded query parameter values during development.",
+          },
+          {
+            title: "Log analysis",
+            description: "Turn encoded URL components into more readable text.",
+          },
+          {
+            title: "Web development",
+            description: "Understand how URL components are represented.",
+          },
+        ]}
+        faqItems={faqData["url-decoder"]}
+        relatedTools={relatedTools}
+      >
+        <div className="space-y-5">
+          <textarea
+            value={input}
+            onChange={(e) => {
+              setInput(e.target.value);
+              setError("");
+            }}
+            rows={8}
+            className="w-full rounded-xl border border-slate-300 bg-slate-50 p-4 font-mono text-sm leading-7 outline-none focus:border-indigo-500 focus:ring-2 focus:ring-indigo-100"
+            placeholder="Paste encoded URL text..."
+          />
+
+          <div className="flex flex-wrap gap-3">
+            <button
+              type="button"
+              onClick={decode}
+              className="inline-flex items-center gap-2 rounded-lg bg-indigo-600 px-5 py-2.5 text-sm font-semibold text-white hover:bg-indigo-700"
+            >
+              <Link2 size={17} />
+              Decode URL
+            </button>
+
+            <ClearButton
+              onClick={() => {
+                setInput("");
+                setOutput("");
+                setError("");
+              }}
+              disabled={!input && !output}
+            />
+          </div>
+
+          {error && (
+            <div className="flex gap-3 rounded-xl border border-red-200 bg-red-50 p-4 text-sm text-red-700">
+              <AlertCircle size={18} />
+              {error}
+            </div>
+          )}
+
+          {output && (
+            <div>
+              <div className="mb-2 flex items-center justify-between">
+                <h2 className="font-semibold">Decoded Result</h2>
+                <CopyButton text={output} />
+              </div>
+
+              <textarea
+                value={output}
+                readOnly
+                rows={7}
+                className="w-full rounded-xl bg-slate-950 p-4 text-sm leading-7 text-slate-200 outline-none"
+              />
+            </div>
+          )}
+        </div>
+      </ToolLayout>
+    </>
   );
 }

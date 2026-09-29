@@ -27,7 +27,7 @@ export default function Home() {
       <SEO
         title="DevTools - Free Online Developer Tools"
         description="Free browser-based developer tools including JSON Formatter, Base64 Encoder, URL Encoder, Regex Tester, UUID Generator and more."
-        canonical="https://yourdomain.com/"
+        canonical="https://devtools-toolkit.vercel.app/"
       />
 
       <main>
@@ -68,7 +68,10 @@ export default function Home() {
           </div>
         </section>
 
-        <section className="mx-auto max-w-7xl px-4 py-16 sm:px-6 lg:px-8" id="tools">
+        <section
+          className="mx-auto max-w-7xl px-4 py-16 sm:px-6 lg:px-8"
+          id="tools"
+        >
           <div className="flex items-end justify-between gap-4">
             <div>
               <p className="text-sm font-semibold uppercase tracking-wider text-indigo-600">
