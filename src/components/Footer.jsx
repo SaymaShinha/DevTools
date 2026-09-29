@@ -149,7 +149,7 @@ export default function Footer() {
             </a>
 
             <a
-              href="https://github.com/"
+              href="https://github.com/SaymaShinha/DevTools"
               target="_blank"
               rel="noreferrer"
               className="text-slate-500 transition hover:text-slate-900"
