@@ -1,0 +1,90 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<urlset
+  xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+
+  <url>
+    <loc>https://yourdomain.com/</loc>
+  </url>
+
+  <url>
+    <loc>https://yourdomain.com/tools/json-formatter</loc>
+  </url>
+
+  <url>
+    <loc>https://yourdomain.com/tools/json-validator</loc>
+  </url>
+
+  <url>
+    <loc>https://yourdomain.com/tools/base64-encoder</loc>
+  </url>
+
+  <url>
+    <loc>https://yourdomain.com/tools/base64-decoder</loc>
+  </url>
+
+  <url>
+    <loc>https://yourdomain.com/tools/url-encoder</loc>
+  </url>
+
+  <url>
+    <loc>https://yourdomain.com/tools/url-decoder</loc>
+  </url>
+
+  <url>
+    <loc>https://yourdomain.com/tools/html-encoder</loc>
+  </url>
+
+  <url>
+    <loc>https://yourdomain.com/tools/html-formatter</loc>
+  </url>
+
+  <url>
+    <loc>https://yourdomain.com/tools/text-case-converter</loc>
+  </url>
+
+  <url>
+    <loc>https://yourdomain.com/tools/word-counter</loc>
+  </url>
+
+  <url>
+    <loc>https://yourdomain.com/tools/slug-generator</loc>
+  </url>
+
+  <url>
+    <loc>https://yourdomain.com/tools/uuid-generator</loc>
+  </url>
+
+  <url>
+    <loc>https://yourdomain.com/tools/timestamp-converter</loc>
+  </url>
+
+  <url>
+    <loc>https://yourdomain.com/tools/color-converter</loc>
+  </url>
+
+  <url>
+    <loc>https://yourdomain.com/tools/regex-tester</loc>
+  </url>
+
+  <url>
+    <loc>https://yourdomain.com/about</loc>
+  </url>
+
+  <url>
+    <loc>https://yourdomain.com/contact</loc>
+  </url>
+
+  <url>
+    <loc>https://yourdomain.com/privacy-policy</loc>
+  </url>
+
+  <url>
+    <loc>https://yourdomain.com/terms-of-use</loc>
+  </url>
+
+  <url>
+    <loc>https://yourdomain.com/cookie-policy</loc>
+  </url>
+
+</urlset>
