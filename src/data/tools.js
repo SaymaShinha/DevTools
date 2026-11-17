@@ -12,6 +12,7 @@ import {
   Clock3,
   Palette,
   Regex,
+  ShieldCheck,
 } from "lucide-react";
 
 export const tools = [
